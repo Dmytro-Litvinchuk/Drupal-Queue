@@ -1,0 +1,45 @@
+<?php
+
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_update_N().
+ * Change title of each node.
+ */
+function simple_batch_update_8116(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    $total_number = \Drupal::entityQuery('node')
+      ->count()->execute();
+    $sandbox['total'] = $total_number;
+    $sandbox['current'] = 0;
+    $sandbox['nid'] = 0;
+  }
+  $nodes_per_batch = 25;
+  // Get id for one cycle.
+  $nids = \Drupal::entityQuery('node')
+    ->condition('nid', $sandbox['nid'], '>')
+    ->range(0, $nodes_per_batch)
+    ->sort('nid') // ASC by default.
+    ->execute();
+  foreach ($nids as $nid) {
+    $node = Node::load($nid);
+    // Title with random number.
+    $title = $node->label() . rand(0, 100);
+    $node->set('title', $title);
+    $node->save();
+    $sandbox['current']++;
+    $sandbox['nid'] = $nid;
+  }
+  if ($sandbox['total'] == 0) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Implements hook_post_update_NAME().
+ */
+function simple_batch_post_update_0001_first(&$sandbox) {
+
+}

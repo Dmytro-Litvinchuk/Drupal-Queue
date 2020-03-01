@@ -1,0 +1,16 @@
+<?php
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function simple_batch_node_insert(NodeInterface $node) {
+  drupal_set_message('Created something');
+  $data['title'] = $node->label();
+  $queue = \Drupal::queue('my_custom_email');
+  $queue->createQueue();
+  $queue->createItem([
+    'node_title' => $data['title'],
+  ]);
+}

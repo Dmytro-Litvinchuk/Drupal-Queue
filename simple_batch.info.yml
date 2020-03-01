@@ -1,0 +1,5 @@
+name: 'Simple Batch'
+type: module
+description: 'Custom module for batch and queue process'
+core: 8.x
+package: Custom
