@@ -17,3 +17,38 @@ function simple_batch_node_insert(NodeInterface $node) {
     'node_link' => $data['link'],
   ]);
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ * Whether node create or update it works.
+ */
+function simple_batch_node_presave(NodeInterface $node) {
+  if ($node->isPublished()) {
+    $queue = \Drupal::queue('unpublish_node_queue');
+    $queue->createQueue();
+    $data = $node->id();
+    $queue->createItem($data);
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function simple_batch_cron() {
+  $queue = \Drupal::queue('unpublish_node_queue');
+  $queue->createQueue();
+  $lastNID = Drupal::entityQuery('node')
+    ->sort('changed', 'DESC')
+    ->range(0, 15)
+    ->execute();
+  // Add only published nodes.
+  foreach ($lastNID as $nid) {
+    $node = Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->load($nid);
+    if ($node->isPublished()) {
+      $queue->createItem($nid);
+    }
+  }
+}
+
