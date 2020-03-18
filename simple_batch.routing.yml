@@ -1,0 +1,7 @@
+simple_batch.form:
+  path: '/batch_form'
+  defaults:
+    _form: '\Drupal\simple_batch\Form\BatchForm'
+    _title: 'Form queue'
+  requirements:
+    _permission: 'access content'
