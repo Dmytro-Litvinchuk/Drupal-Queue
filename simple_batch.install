@@ -35,6 +35,7 @@ function simple_batch_update_8116(&$sandbox) {
   } else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
+
 }
 
 /**
